@@ -339,9 +339,18 @@ COMMENT ON FUNCTION public.process_monthly_credit_resets() IS 'Resets monthly cr
 COMMENT ON FUNCTION public.reset_monthly_credits(UUID) IS 'Resets monthly credits for a specific user (unused credits are lost)';
 COMMENT ON FUNCTION public.use_credits(UUID, INTEGER, TEXT) IS 'Uses credits with monthly limit enforcement';
 
--- Step 13: Setup instructions for cron job (uncomment if pg_cron is available)
--- SELECT cron.unschedule('monthly-credit-renewal'); -- Remove old job if exists
--- SELECT cron.schedule('monthly-credit-reset', '0 0 * * *', 'SELECT public.process_monthly_credit_resets();');
+-- Step 13: Setup instructions for cron job (production ready)
+-- For production deployment, set up the cron job using Supabase dashboard or CLI:
+-- 1. Go to Database > Extensions and enable pg_cron
+-- 2. Run the following SQL in the SQL editor:
+/*
+SELECT cron.unschedule('monthly-credit-renewal'); -- Remove old job if exists
+SELECT cron.schedule(
+  'monthly-credit-reset',
+  '0 0 * * *', -- Run daily at midnight UTC
+  'SELECT public.process_monthly_credit_resets();'
+);
+*/
 
 -- Final success message
 DO $$

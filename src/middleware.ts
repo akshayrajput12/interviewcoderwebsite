@@ -1,9 +1,10 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import type { Session } from '@supabase/supabase-js';
 
 export async function middleware(req: NextRequest) {
-  let res = NextResponse.next({
+  const res = NextResponse.next({
     request: {
       headers: req.headers,
     },
@@ -74,7 +75,7 @@ export async function middleware(req: NextRequest) {
             refresh_token: sessionData.refresh_token,
             expires_at: sessionData.expires_at,
             user: sessionData.user,
-          } as any;
+          } as Session;
           console.log('Using session from custom cookie');
         }
       } catch (e) {
@@ -101,7 +102,7 @@ export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
 
   // Routes that require authentication
-  const protectedRoutes = ['/dashboard', '/settings', '/practice', '/test-auth'];
+  const protectedRoutes = ['/dashboard', '/settings', '/practice'];
 
   // Routes that should redirect to dashboard if already logged in
   const authRoutes = ['/login', '/signup'];
@@ -128,7 +129,6 @@ export const config = {
     '/dashboard/:path*',
     '/settings/:path*',
     '/practice/:path*',
-    '/test-auth',
     '/login',
     '/signup',
   ],

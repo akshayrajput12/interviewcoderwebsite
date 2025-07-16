@@ -118,14 +118,12 @@ export async function GET(request: Request) {
     const arpu = activeSubscribers > 0 ? totalRevenue / activeSubscribers : 0;
     
     // Calculate interview metrics
-    const { data: interviewStats, error: interviewStatsError } = await supabase
+    const { count: totalInterviews } = await supabase
       .from('interview_sessions')
-      .select('id', { count: 'exact' });
-    
-    const totalInterviews = interviewStats?.count || 0;
+      .select('*', { count: 'exact', head: true });
     
     // Calculate credit usage
-    const { data: creditUsage, error: creditUsageError } = await supabase
+    const { data: creditUsage } = await supabase
       .from('credit_transactions')
       .select('amount')
       .eq('transaction_type', 'debit');

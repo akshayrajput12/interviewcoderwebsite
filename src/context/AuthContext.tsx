@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabaseClient, ensureFreshSession, syncSessionToCookies } from '../utils/supabase-client';
-import { useSessionMonitor } from '../hooks/useSessionMonitor';
 
 type AuthContextType = {
   user: User | null;
