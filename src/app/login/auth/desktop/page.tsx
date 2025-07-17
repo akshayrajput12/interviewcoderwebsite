@@ -20,11 +20,36 @@ function DesktopAuthContent() {
     const handleDesktopAuth = async () => {
       try {
         const state = searchParams.get('state');
-        
+
         if (!state) {
-          setStatus('error');
-          setMessage('Invalid authentication request. Missing state parameter.');
-          return;
+          // Generate a new state and redirect to proper flow
+          setStatus('loading');
+          setMessage('Initializing desktop authentication...');
+
+          try {
+            const response = await fetch('/api/auth/desktop', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'initiate' })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              // Redirect to the proper auth URL with state
+              window.location.href = data.authUrl;
+              return;
+            } else {
+              setStatus('error');
+              setMessage('Failed to initialize authentication. Please try again.');
+              return;
+            }
+          } catch (error) {
+            console.error('Failed to initialize auth:', error);
+            setStatus('error');
+            setMessage('Failed to initialize authentication. Please try again.');
+            return;
+          }
         }
 
         // Verify the state parameter exists in our backend
@@ -131,6 +156,32 @@ function DesktopAuthContent() {
     router.push(`/signup?desktop_auth=true&state=${state}`);
   };
 
+  const handleManualAuth = async () => {
+    setStatus('loading');
+    setMessage('Starting authentication...');
+
+    try {
+      const response = await fetch('/api/auth/desktop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'initiate' })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        window.location.href = data.authUrl;
+      } else {
+        setStatus('error');
+        setMessage('Failed to start authentication. Please try again.');
+      }
+    } catch (error) {
+      console.error('Manual auth failed:', error);
+      setStatus('error');
+      setMessage('Failed to start authentication. Please try again.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       <Header />
@@ -207,12 +258,20 @@ function DesktopAuthContent() {
 
           {/* Error Actions */}
           {status === 'error' && (
-            <button
-              onClick={() => router.push('/')}
-              className="bg-[#2A2A2A] text-white py-2 px-4 rounded-md hover:bg-[#3A3A3A] transition-colors"
-            >
-              Return to Home
-            </button>
+            <div className="space-y-3">
+              <button
+                onClick={handleManualAuth}
+                className="w-full bg-yellow-400 text-black py-3 px-4 rounded-md font-medium hover:bg-yellow-500 transition-colors"
+              >
+                Try Authentication Again
+              </button>
+              <button
+                onClick={() => router.push('/')}
+                className="w-full bg-[#2A2A2A] text-white py-2 px-4 rounded-md hover:bg-[#3A3A3A] transition-colors"
+              >
+                Return to Home
+              </button>
+            </div>
           )}
         </motion.div>
       </div>

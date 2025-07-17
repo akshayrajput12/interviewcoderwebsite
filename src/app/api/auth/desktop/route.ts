@@ -5,9 +5,11 @@ import { authStates, cleanupExpiredStates } from './auth-state';
 export async function POST(request: NextRequest) {
   try {
     cleanupExpiredStates();
-    
+
     const body = await request.json();
     const { action, state, redirectUrl } = body;
+
+    console.log('Desktop auth API called:', { action, state: state ? 'present' : 'missing' });
 
     if (action === 'initiate') {
       // Generate a secure state parameter for CSRF protection
@@ -22,6 +24,8 @@ export async function POST(request: NextRequest) {
       // Return the auth URL that the desktop app should open
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
       const authUrl = `${baseUrl}/login/auth/desktop?state=${authState}`;
+
+      console.log('Generated auth URL:', authUrl);
 
       return NextResponse.json({
         success: true,
