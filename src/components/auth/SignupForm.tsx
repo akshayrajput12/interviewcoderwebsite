@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function SignupForm() {
+function SignupFormContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -27,7 +27,7 @@ export default function SignupForm() {
     try {
       const { error } = await signInWithGoogle();
       if (error) {
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'Google sign-in failed');
         setSocialLoading(null);
       }
       // Don't redirect here - let the callback handle it
@@ -44,7 +44,7 @@ export default function SignupForm() {
     try {
       const { error } = await signInWithGithub();
       if (error) {
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'GitHub sign-in failed');
         setSocialLoading(null);
       }
       // Don't redirect here - let the callback handle it
@@ -71,7 +71,7 @@ export default function SignupForm() {
       const { error, user } = await signUp(email, password);
       
       if (error) {
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'Sign up failed');
         return;
       }
       
@@ -210,5 +210,19 @@ export default function SignupForm() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function SignupForm() {
+  return (
+    <Suspense fallback={
+      <div className="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+        <div className="flex items-center justify-center h-32">
+          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    }>
+      <SignupFormContent />
+    </Suspense>
   );
 }

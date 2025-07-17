@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function LoginForm() {
+function LoginFormContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +29,7 @@ export default function LoginForm() {
       const { error } = await signIn(email, password);
       
       if (error) {
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'Authentication failed');
         return;
       }
       
@@ -49,7 +49,7 @@ export default function LoginForm() {
     try {
       const { error } = await signInWithGoogle();
       if (error) {
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'Google sign-in failed');
         setSocialLoading(null);
       }
       // Don't redirect here - let the callback handle it
@@ -66,7 +66,7 @@ export default function LoginForm() {
     try {
       const { error } = await signInWithGithub();
       if (error) {
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'GitHub sign-in failed');
         setSocialLoading(null);
       }
       // Don't redirect here - let the callback handle it
@@ -169,5 +169,19 @@ export default function LoginForm() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function LoginForm() {
+  return (
+    <Suspense fallback={
+      <div className="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+        <div className="flex items-center justify-center h-32">
+          <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    }>
+      <LoginFormContent />
+    </Suspense>
   );
 }

@@ -1,22 +1,53 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Header from '../home/home-components/Header';
 import Footer from '../home/home-components/Footer';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function SignupPage() {
+function SignupContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { signUp, signInWithGoogle, signInWithGithub } = useAuth();
+  const { signUp, signInWithGoogle, signInWithGithub, session } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Check if this is a desktop authentication flow
+  const isDesktopAuth = searchParams.get('desktop_auth') === 'true';
+  const desktopState = searchParams.get('state');
+
+  // Handle desktop authentication completion
+  useEffect(() => {
+    const handleDesktopAuthCompletion = async () => {
+      if (isDesktopAuth && desktopState && session) {
+        try {
+          // Complete the desktop authentication
+          await fetch('/api/auth/desktop/complete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ state: desktopState, session })
+          });
+
+          // Redirect to desktop app
+          window.location.href = `interviewcoder://auth?success=true&state=${desktopState}`;
+          // Fallback redirect after a short delay
+          setTimeout(() => router.push('/'), 1000);
+        } catch (error) {
+          console.error('Desktop auth completion error:', error);
+          setError('Failed to complete desktop authentication');
+        }
+      }
+    };
+
+    handleDesktopAuthCompletion();
+  }, [isDesktopAuth, desktopState, session, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +65,7 @@ export default function SignupPage() {
       const { error, user } = await signUp(email, password);
       
       if (error) {
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'Sign up failed');
         setIsLoading(false);
         return;
       }
@@ -57,8 +88,12 @@ export default function SignupPage() {
         }
       }
       
-      // Redirect to home page after signup
-      router.push('/');
+      // If this is desktop auth, the useEffect will handle completion
+      // Otherwise, redirect to home page
+      if (!isDesktopAuth) {
+        router.push('/');
+      }
+      setIsLoading(false);
     } catch (err) {
       console.error('Signup error:', err);
       setError('An unexpected error occurred. Please try again.');
@@ -70,9 +105,9 @@ export default function SignupPage() {
     setError(null);
     setSocialLoading('google');
     try {
-      const { error } = await signInWithGoogle();
+      const { error } = await signInWithGoogle(isDesktopAuth);
       if (error) {
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'Google sign-in failed');
         setSocialLoading(null);
       }
       // Don't redirect here - let the callback handle it
@@ -87,9 +122,9 @@ export default function SignupPage() {
     setError(null);
     setSocialLoading('github');
     try {
-      const { error } = await signInWithGithub();
+      const { error } = await signInWithGithub(isDesktopAuth);
       if (error) {
-        setError(error.message);
+        setError(error instanceof Error ? error.message : 'GitHub sign-in failed');
         setSocialLoading(null);
       }
       // Don't redirect here - let the callback handle it
@@ -273,5 +308,21 @@ export default function SignupPage() {
       
       <Footer />
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black text-white flex flex-col">
+        <Header />
+        <div className="flex-grow flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <Footer />
+      </div>
+    }>
+      <SignupContent />
+    </Suspense>
   );
 }
