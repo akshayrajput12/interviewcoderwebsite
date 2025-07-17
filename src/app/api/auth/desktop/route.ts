@@ -2,6 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { randomBytes } from 'crypto';
 import { authStates, cleanupExpiredStates } from './auth-state';
 
+// CORS headers for desktop app requests
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With',
+  'Access-Control-Max-Age': '86400',
+};
+
+// Handle preflight OPTIONS requests
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 200,
+    headers: corsHeaders,
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     cleanupExpiredStates();
@@ -31,6 +47,8 @@ export async function POST(request: NextRequest) {
         success: true,
         authUrl,
         state: authState
+      }, {
+        headers: corsHeaders
       });
     }
 
@@ -40,7 +58,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: false,
           error: 'State parameter is required'
-        }, { status: 400 });
+        }, {
+          status: 400,
+          headers: corsHeaders
+        });
       }
 
       // Check if state exists and is valid
@@ -49,7 +70,10 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: false,
           error: 'Invalid or expired state'
-        }, { status: 400 });
+        }, {
+          status: 400,
+          headers: corsHeaders
+        });
       }
 
       // Check for session using the state-specific session storage
@@ -68,6 +92,8 @@ export async function POST(request: NextRequest) {
           success: true,
           authenticated: true,
           session
+        }, {
+          headers: corsHeaders
         });
       }
 
@@ -76,20 +102,28 @@ export async function POST(request: NextRequest) {
         success: true,
         authenticated: false,
         message: 'Authentication pending'
+      }, {
+        headers: corsHeaders
       });
     }
 
     return NextResponse.json({
       success: false,
       error: 'Invalid action'
-    }, { status: 400 });
+    }, {
+      status: 400,
+      headers: corsHeaders
+    });
 
   } catch (error) {
     console.error('Desktop auth API error:', error);
     return NextResponse.json({
       success: false,
       error: 'Internal server error'
-    }, { status: 500 });
+    }, {
+      status: 500,
+      headers: corsHeaders
+    });
   }
 }
 
