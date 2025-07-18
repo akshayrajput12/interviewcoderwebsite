@@ -19,8 +19,27 @@ export async function OPTIONS(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { state, session } = body;
+    // Handle empty or invalid JSON
+    let body;
+    try {
+      body = await request.json();
+    } catch (jsonError) {
+      console.error('Invalid JSON in complete request:', jsonError);
+      return NextResponse.json({
+        success: false,
+        error: 'Invalid JSON in request body'
+      }, {
+        status: 400,
+        headers: corsHeaders
+      });
+    }
+
+    const { state, session } = body || {};
+
+    console.log('Desktop complete API called:', {
+      state: state ? 'present' : 'missing',
+      session: session ? 'present' : 'missing'
+    });
 
     if (!state || !session) {
       return NextResponse.json({

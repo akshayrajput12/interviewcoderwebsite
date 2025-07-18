@@ -123,10 +123,8 @@ function DesktopAuthContent() {
             setCountdown(prev => {
               if (prev <= 1) {
                 clearInterval(countdownInterval);
-                // Redirect to desktop app using custom URL scheme
-                window.location.href = `interviewcoder://auth?success=true&state=${state}`;
-                // Fallback redirect after a short delay
-                setTimeout(() => router.push('/'), 1000);
+                // Try to redirect to desktop app
+                handleDesktopRedirect(state);
                 return 0;
               }
               return prev - 1;
@@ -145,6 +143,35 @@ function DesktopAuthContent() {
 
     handleDesktopAuth();
   }, [searchParams, user, session, router, status]);
+
+  const handleDesktopRedirect = (state: string) => {
+    const desktopUrl = `interviewcoder://auth?success=true&state=${state}`;
+
+    try {
+      // Create a user-initiated action to avoid gesture requirement
+      const link = document.createElement('a');
+      link.href = desktopUrl;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+
+      // Try to click the link to trigger the redirect
+      link.click();
+
+      // Clean up
+      document.body.removeChild(link);
+
+      // Fallback redirect after a short delay
+      setTimeout(() => {
+        router.push('/');
+      }, 2000);
+
+    } catch (error) {
+      console.error('Desktop redirect failed:', error);
+      // Fallback to manual redirect
+      window.location.href = desktopUrl;
+      setTimeout(() => router.push('/'), 2000);
+    }
+  };
 
   const handleLogin = () => {
     const state = searchParams.get('state');
@@ -251,8 +278,19 @@ function DesktopAuthContent() {
 
           {/* Success Countdown */}
           {status === 'success' && (
-            <div className="text-sm text-gray-400">
-              Redirecting to desktop app in {countdown} seconds...
+            <div className="space-y-4">
+              <div className="text-sm text-gray-400">
+                Redirecting to desktop app in {countdown} seconds...
+              </div>
+              <button
+                onClick={() => {
+                  const state = searchParams.get('state');
+                  if (state) handleDesktopRedirect(state);
+                }}
+                className="w-full bg-yellow-400 text-black py-2 px-4 rounded-md font-medium hover:bg-yellow-500 transition-colors"
+              >
+                Open Desktop App Now
+              </button>
             </div>
           )}
 

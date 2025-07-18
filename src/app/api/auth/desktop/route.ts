@@ -22,10 +22,35 @@ export async function POST(request: NextRequest) {
   try {
     cleanupExpiredStates();
 
-    const body = await request.json();
-    const { action, state, redirectUrl } = body;
+    // Handle empty or invalid JSON
+    let body;
+    try {
+      body = await request.json();
+    } catch (jsonError) {
+      console.error('Invalid JSON in request:', jsonError);
+      return NextResponse.json({
+        success: false,
+        error: 'Invalid JSON in request body'
+      }, {
+        status: 400,
+        headers: corsHeaders
+      });
+    }
+
+    const { action, state, redirectUrl } = body || {};
 
     console.log('Desktop auth API called:', { action, state: state ? 'present' : 'missing' });
+
+    // Validate required action parameter
+    if (!action) {
+      return NextResponse.json({
+        success: false,
+        error: 'Action parameter is required'
+      }, {
+        status: 400,
+        headers: corsHeaders
+      });
+    }
 
     if (action === 'initiate') {
       // Generate a secure state parameter for CSRF protection
