@@ -196,7 +196,7 @@ export default function HowToUseSection() {
                 <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                 <div className="w-3 h-3 bg-green-500 rounded-full"></div>
               </div>
-              <span className="text-gray-300 text-sm ml-2">Interview Coder - Solution Generated</span>
+              <span className="text-gray-300 text-sm ml-2">GhostCoder - Solution Generated</span>
             </div>
             
             {/* Content */}

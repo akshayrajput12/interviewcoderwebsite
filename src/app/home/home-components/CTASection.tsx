@@ -3,6 +3,10 @@
 import { motion } from 'framer-motion';
 
 export default function CTASection() {
+  // Redirect functions
+  const redirectToAuth = () => {
+    window.location.href = '/signup';
+  };
   // Define keyboard layout exactly as in the image
   const row1 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
   const row2 = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']'];
@@ -183,30 +187,48 @@ export default function CTASection() {
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
         >
-          Download and use Interview Coder today.
+          Download and use GhostCoder today.
         </motion.p>
 
         <motion.div
-          className="flex flex-col sm:flex-row justify-center gap-4 max-w-xl mx-auto"
+          className="flex flex-col sm:flex-row justify-center gap-3 max-w-xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
           viewport={{ once: true }}
         >
           <motion.button
-            className="bg-yellow-400 text-black font-medium px-8 py-4 rounded-md flex items-center justify-center gap-2 w-full sm:w-auto"
-            whileHover={{ scale: 1.05, boxShadow: '0 0 25px rgba(255, 230, 0, 0.5)' }}
+            onClick={redirectToAuth}
+            className="group relative bg-gradient-to-r from-[#F8E71C] to-[#FFD700] text-black font-semibold px-4 py-2 rounded-lg overflow-hidden cursor-pointer text-xs sm:text-sm"
+            whileHover={{
+              scale: 1.05,
+              boxShadow: '0 5px 15px rgba(248, 231, 28, 0.4)'
+            }}
             whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400 }}
           >
-            <span className="text-lg">⌘</span> Download for Mac
+            <span className="relative z-10 flex items-center gap-2">
+              <span className="text-sm">🚀</span>
+              Join Now - macOS
+            </span>
           </motion.button>
 
           <motion.button
-            className="bg-transparent border border-yellow-400 text-yellow-400 font-medium px-8 py-4 rounded-md flex items-center justify-center gap-2 w-full sm:w-auto"
-            whileHover={{ scale: 1.05, boxShadow: '0 0 25px rgba(255, 230, 0, 0.3)' }}
+            onClick={redirectToAuth}
+            className="group relative bg-transparent border border-[#F8E71C] text-[#F8E71C] font-semibold px-4 py-2 rounded-lg overflow-hidden cursor-pointer text-xs sm:text-sm"
+            whileHover={{
+              scale: 1.05,
+              backgroundColor: '#F8E71C',
+              color: '#000000',
+              boxShadow: '0 5px 15px rgba(248, 231, 28, 0.4)'
+            }}
             whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400 }}
           >
-            <span className="text-lg">⊞</span> Download for Windows
+            <span className="relative z-10 flex items-center gap-2">
+              <span className="text-sm">💻</span>
+              Join Now - Windows
+            </span>
           </motion.button>
         </motion.div>
       </div>

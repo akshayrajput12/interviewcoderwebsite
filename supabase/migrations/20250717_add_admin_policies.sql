@@ -483,7 +483,7 @@ INSERT INTO public.app_settings (key, value, description, is_public)
 VALUES
   ('site_maintenance', '{"enabled": false, "message": "Site is under maintenance. Please check back later."}', 'Site maintenance mode settings', true),
   ('credit_settings', '{"free_signup_credits": 50, "referral_bonus": 25, "monthly_reset_day": 1}', 'Credit allocation settings', false),
-  ('email_templates', '{"welcome": {"subject": "Welcome to Interview Coder", "template_id": "welcome-template"}, "password_reset": {"subject": "Reset Your Password", "template_id": "password-reset-template"}}', 'Email template settings', false),
+  ('email_templates', '{"welcome": {"subject": "Welcome to GhostCoder", "template_id": "welcome-template"}, "password_reset": {"subject": "Reset Your Password", "template_id": "password-reset-template"}}', 'Email template settings', false),
   ('feature_flags', '{"enable_referrals": true, "enable_promo_codes": true, "enable_social_login": true}', 'Feature flag settings', true);
 
 -- Create a function to promote a user to admin

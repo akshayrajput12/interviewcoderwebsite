@@ -1,4 +1,4 @@
-# Interview Coder
+# GhostCoder
 
 A Next.js application built with TypeScript, Tailwind CSS, and Framer Motion, featuring a modern landing page for an AI-powered interview assistance tool.
 

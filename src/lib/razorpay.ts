@@ -10,7 +10,7 @@ export const razorpay = new Razorpay({
 export const razorpayConfig = {
   key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
   currency: 'INR',
-  name: 'Interview Coder',
+  name: 'GhostCoder',
   description: 'Subscription Plan',
   image: '/logo.png', // Add your logo here
   theme: {

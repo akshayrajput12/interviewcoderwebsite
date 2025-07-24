@@ -329,7 +329,7 @@ export default function CompatibilitySection() {
         viewport={{ once: true }}
       >
         <div className="bg-gradient-to-r from-[#1A1A1A] to-[#2A2A2A] rounded-xl p-8 border border-gray-700">
-          <h3 className="text-2xl font-bold text-white mb-4">Why Choose Interview Coder?</h3>
+          <h3 className="text-2xl font-bold text-white mb-4">Why Choose GhostCoder?</h3>
           <div className="grid md:grid-cols-3 gap-6 text-sm text-gray-400">
             <div>
               <div className="text-green-400 text-lg mb-2">🛡️</div>

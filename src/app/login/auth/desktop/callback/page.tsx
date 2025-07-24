@@ -54,7 +54,7 @@ function DesktopOAuthCallbackContent() {
             });
             
             // Redirect to desktop app
-            window.location.href = `interviewcoder://auth?success=true&state=${state}`;
+            window.location.href = `ghostcoder://auth?success=true&state=${state}`;
             // Fallback redirect
             setTimeout(() => router.push('/'), 1000);
           } else {

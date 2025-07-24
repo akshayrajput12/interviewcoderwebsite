@@ -36,7 +36,7 @@ function SignupContent() {
           });
 
           // Redirect to desktop app
-          window.location.href = `interviewcoder://auth?success=true&state=${desktopState}`;
+          window.location.href = `ghostcoder://auth?success=true&state=${desktopState}`;
           // Fallback redirect after a short delay
           setTimeout(() => router.push('/'), 1000);
         } catch (error) {

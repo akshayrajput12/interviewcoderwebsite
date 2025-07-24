@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 const commands = [
   { 
     action: 'Hide/Show Window', 
-    description: 'Hide or show Interview Coder',
+    description: 'Hide or show GhostCoder',
     keys: ['Control', 'B'] 
   },
   { 

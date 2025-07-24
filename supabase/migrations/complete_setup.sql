@@ -1,4 +1,4 @@
--- Complete SQL Setup for Interview Coder Platform
+-- Complete SQL Setup for GhostCoder Platform
 -- This script sets up the entire database structure with all features
 
 -- Drop existing tables and functions if they exist (for clean setup)
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS public.subscription_plans (
 INSERT INTO public.subscription_plans (name, tag, description, price_monthly, price_yearly, credits_per_month, max_interviews_per_month, features, is_popular, highlight_text)
 VALUES 
   (
-    'Interview Coder', 
+    'GhostCoder', 
     'Free', 
     'Try it and see', 
     0, 
@@ -51,7 +51,7 @@ VALUES
     null
   ),
   (
-    'Interview Coder', 
+    'GhostCoder', 
     'Pro', 
     'Most popular', 
     999, 
@@ -63,7 +63,7 @@ VALUES
     'Save ₹6,000 yearly'
   ),
   (
-    'Interview Coder', 
+    'GhostCoder', 
     'Pro', 
     'Monthly subscription', 
     1499, 
@@ -534,8 +534,8 @@ CREATE INDEX IF NOT EXISTS idx_payment_orders_user_id ON public.payment_orders(u
 CREATE INDEX IF NOT EXISTS idx_payment_orders_status ON public.payment_orders(status);
 
 -- Insert admin user (optional - update with your admin email)
--- INSERT INTO auth.users (id, email) VALUES ('00000000-0000-0000-0000-000000000001', 'admin@interviewcoder.com');
--- UPDATE public.profiles SET role_id = 2 WHERE email = 'admin@interviewcoder.com';
+-- INSERT INTO auth.users (id, email) VALUES ('00000000-0000-0000-0000-000000000001', 'admin@ghostcoder.com');
+-- UPDATE public.profiles SET role_id = 2 WHERE email = 'admin@ghostcoder.com';
 
 COMMENT ON TABLE public.subscription_plans IS 'Available subscription plans with pricing and features';
 COMMENT ON TABLE public.profiles IS 'User profiles with monthly credit limits and usage tracking';
@@ -548,7 +548,7 @@ COMMENT ON FUNCTION public.use_credits(UUID, INTEGER, TEXT) IS 'Uses credits wit
 -- Complete setup message
 DO $$
 BEGIN
-  RAISE NOTICE 'Interview Coder database setup completed successfully!';
+  RAISE NOTICE 'GhostCoder database setup completed successfully!';
   RAISE NOTICE 'Features included:';
   RAISE NOTICE '- Free plan with 0 credits';
   RAISE NOTICE '- Pro yearly plan (₹999/month billed ₹11,988 annually) - 150 credits/month, no rollover';

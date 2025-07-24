@@ -21,7 +21,7 @@ export default function DoesItWorkPage() {
                         transition={{ duration: 0.6 }}
                     >
                         <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-                            How Interview Coder is Still Undetectable
+                            How GhostCoder is Still Undetectable
                         </h1>
                         <p className="text-gray-400 text-sm md:text-base">
                             Last updated: August 2023 • <span className="text-yellow-400">Still working in all major interviews</span>
@@ -39,11 +39,11 @@ export default function DoesItWorkPage() {
                         <div className="bg-[#111111] rounded-lg p-4 md:p-6 mb-8 border border-gray-800">
                             <pre className="text-gray-300 text-xs md:text-sm font-mono overflow-x-auto whitespace-pre-wrap">
                                 <code>
-                                    {`// Interview Coder runs in a separate process
+                                    {`// GhostCoder runs in a separate process
 // It doesn't modify your browser in any way
 // It's completely invisible to monitoring tools
 
-const interviewCoder = {
+const ghostCoder = {
   detectionRisk: 0,
   browserFingerprint: "unchanged",
   monitoringBypass: true
@@ -56,7 +56,7 @@ const interviewCoder = {
                             <div className="relative w-full max-w-md aspect-square">
                                 <Image
                                     src="/diagram1.png"
-                                    alt="Diagram showing how Interview Coder works separately from the browser"
+                                    alt="Diagram showing how GhostCoder works separately from the browser"
                                     width={400}
                                     height={400}
                                     className="mx-auto"
@@ -65,10 +65,10 @@ const interviewCoder = {
                         </div>
 
                         <p className="text-gray-300 mb-4">
-                            Unlike browser extensions or plugins that can be detected, Interview Coder runs as a separate application on your computer. It doesn't modify your browser or inject any code that could be detected.
+                            Unlike browser extensions or plugins that can be detected, GhostCoder runs as a separate application on your computer. It doesn't modify your browser or inject any code that could be detected.
                         </p>
                         <p className="text-gray-300">
-                            This means that even the most sophisticated monitoring tools can't detect that you're using Interview Coder during your technical interviews.
+                            This means that even the most sophisticated monitoring tools can't detect that you're using GhostCoder during your technical interviews.
                         </p>
                     </motion.section>
 
@@ -120,7 +120,7 @@ const stealthExtension = {
                             Modern interview platforms use sophisticated detection methods to identify when candidates are using unauthorized tools. Browser extensions, even those claiming to be "undetectable," modify your browser in ways that can be detected.
                         </p>
                         <p className="text-gray-300">
-                            Interview Coder avoids these pitfalls by operating completely outside of your browser environment.
+                            GhostCoder avoids these pitfalls by operating completely outside of your browser environment.
                         </p>
                     </motion.section>
 
@@ -133,7 +133,7 @@ const stealthExtension = {
                     >
                         <h2 className="text-xl md:text-2xl font-bold text-white mb-6">How we stay ahead of detection</h2>
                         <p className="text-gray-300 mb-6">
-                            We continuously monitor interview platforms and their detection methods to ensure Interview Coder remains undetectable. Our team includes security experts who specialize in anti-detection technologies.
+                            We continuously monitor interview platforms and their detection methods to ensure GhostCoder remains undetectable. Our team includes security experts who specialize in anti-detection technologies.
                         </p>
 
                         <div className="bg-[#111111] rounded-lg p-4 md:p-6 mb-8 border border-gray-800">
@@ -164,14 +164,14 @@ const stealthExtension = {
                         <div className="grid md:grid-cols-2 gap-4 mb-8">
                             <div className="bg-[#111111] rounded-lg p-4 border border-gray-800">
                                 <p className="text-gray-300 italic mb-3">
-                                    "Used Interview Coder for my Google interview. Got the job offer and no one suspected a thing. This tool is a game-changer!"
+                                    "Used GhostCoder for my Google interview. Got the job offer and no one suspected a thing. This tool is a game-changer!"
                                 </p>
                                 <p className="text-yellow-400 text-sm">— Software Engineer, hired at Google</p>
                             </div>
 
                             <div className="bg-[#111111] rounded-lg p-4 border border-gray-800">
                                 <p className="text-gray-300 italic mb-3">
-                                    "I was nervous about using assistance during my Amazon interview, but Interview Coder worked flawlessly. No detection issues at all."
+                                    "I was nervous about using assistance during my Amazon interview, but GhostCoder worked flawlessly. No detection issues at all."
                                 </p>
                                 <p className="text-yellow-400 text-sm">— Senior Developer, hired at Amazon</p>
                             </div>
@@ -181,7 +181,7 @@ const stealthExtension = {
                             <div className="relative w-full max-w-md aspect-square">
                                 <Image
                                     src="/diagram3.png"
-                                    alt="Comparison of Interview Coder vs other solutions"
+                                    alt="Comparison of GhostCoder vs other solutions"
                                     width={400}
                                     height={400}
                                     className="mx-auto"
@@ -199,7 +199,7 @@ const stealthExtension = {
                     >
                         <h2 className="text-xl md:text-2xl font-bold text-white mb-6">Try it risk-free</h2>
                         <p className="text-gray-300 mb-8">
-                            Join thousands of successful candidates who have secured their dream jobs with the help of Interview Coder.
+                            Join thousands of successful candidates who have secured their dream jobs with the help of GhostCoder.
                         </p>
 
                         <div className="flex flex-col sm:flex-row justify-center gap-4">

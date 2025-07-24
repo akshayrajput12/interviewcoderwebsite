@@ -10,7 +10,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: "Interview Coder - AI for Leetcode Interviews",
+  title: "GhostCoder - AI for Leetcode Interviews",
   description: "Nail your technical interviews with real-time AI assistance. The ultimate AI assistant for technical interviews.",
 };
 

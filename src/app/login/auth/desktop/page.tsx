@@ -145,7 +145,7 @@ function DesktopAuthContent() {
   }, [searchParams, user, session, router, status]);
 
   const handleDesktopRedirect = (state: string) => {
-    const desktopUrl = `interviewcoder://auth?success=true&state=${state}`;
+    const desktopUrl = `ghostcoder://auth?success=true&state=${state}`;
 
     try {
       // Create a user-initiated action to avoid gesture requirement

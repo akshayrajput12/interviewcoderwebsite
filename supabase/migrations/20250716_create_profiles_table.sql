@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS public.subscription_plans (
 INSERT INTO public.subscription_plans (name, tag, description, price_monthly, price_yearly, credits_per_month, max_interviews_per_month, features, is_popular, highlight_text)
 VALUES 
   (
-    'Interview Coder',
+    'GhostCoder',
     'Free',
     'Try it and see',
     0,
@@ -33,7 +33,7 @@ VALUES
     null
   ),
   (
-    'Interview Coder', 
+    'GhostCoder', 
     'Pro', 
     'Most popular', 
     999, 
@@ -45,7 +45,7 @@ VALUES
     'Save ₹6,000 yearly'
   ),
   (
-    'Interview Coder', 
+    'GhostCoder', 
     'Pro', 
     'Monthly subscription', 
     1499, 

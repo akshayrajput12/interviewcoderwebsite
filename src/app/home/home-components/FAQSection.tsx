@@ -5,16 +5,16 @@ import { useState } from 'react';
 
 const faqs = [
   {
-    question: 'Is Interview Coder safe?',
-    answer: 'Yes, Interview Coder is completely safe to use. We employ advanced security measures and encryption to protect your data and ensure your privacy during interviews.'
+    question: 'Is GhostCoder safe?',
+    answer: 'Yes, GhostCoder is completely safe to use. We employ advanced security measures and encryption to protect your data and ensure your privacy during interviews.'
   },
   {
-    question: 'Is Interview Coder detectable?',
-    answer: 'No, Interview Coder is designed to be completely undetectable. We use sophisticated techniques to bypass screen capture detection and mimic natural human typing patterns.'
+    question: 'Is GhostCoder detectable?',
+    answer: 'No, GhostCoder is designed to be completely undetectable. We use sophisticated techniques to bypass screen capture detection and mimic natural human typing patterns.'
   },
   {
     question: 'What are credits and how do they work?',
-    answer: 'Credits are used for interview assistance sessions. Each credit allows you to use Interview Coder for one technical interview. Credits refresh at the beginning of each billing cycle.'
+    answer: 'Credits are used for interview assistance sessions. Each credit allows you to use GhostCoder for one technical interview. Credits refresh at the beginning of each billing cycle.'
   },
   {
     question: 'Can I purchase additional credits?',
@@ -25,7 +25,7 @@ const faqs = [
     answer: "We offer a 7-day money-back guarantee if you're not satisfied with our service. Annual subscriptions can be refunded on a prorated basis within 30 days of purchase."
   },
   {
-    question: 'Does Interview Coder offer support?',
+    question: 'Does GhostCoder offer support?',
     answer: 'Yes, we provide comprehensive support through our Help Center, email support, and live chat for Pro users. Our team is available to help you with any questions or issues.'
   },
   {

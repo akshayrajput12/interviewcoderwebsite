@@ -10,67 +10,71 @@ interface BillingSectionProps {
 }
 
 export default function BillingSection({ profile, onProfileUpdate }: BillingSectionProps) {
-  const [plans, setPlans] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+  const currentPlan = profile?.subscription_plan;
 
-  // Fetch available plans
-  useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        const response = await fetch('/api/subscription/plans');
-        if (response.ok) {
-          const data = await response.json();
-          setPlans(data.plans || []);
-        }
-      } catch (error) {
-        console.error('Error fetching plans:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Calculate next credit reset date (assuming monthly reset)
+  const getNextResetDate = () => {
+    if (!profile?.subscription_start_date) return 'N/A';
 
-    fetchPlans();
-  }, []);
+    const startDate = new Date(profile.subscription_start_date);
+    const now = new Date();
+    const nextReset = new Date(startDate);
 
-  const currentPlan = profile?.subscription_plan || plans.find(p => p.id === 1); // Default to free plan
+    // Set to next month from start date
+    nextReset.setMonth(startDate.getMonth() + Math.ceil((now.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 30)) + 1);
+
+    return nextReset.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
 
   return (
     <div className="space-y-8">
       <div>
         <h2 className="text-xl font-semibold mb-6">Billing & Subscription</h2>
-        
-        {/* Current Plan */}
+
+        {/* Current Plan Details */}
         <div className="bg-[#1a1a1a] rounded-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium">Current Plan</h3>
-            <span className={`text-white text-xs px-3 py-1 rounded-full font-medium ${
-              profile?.subscription_status === 'active' ? 'bg-green-500' : 'bg-gray-500'
-            }`}>
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-medium">Current Plan Details</h3>
+            <span className={`text-white text-xs px-3 py-1 rounded-full font-medium ${profile?.subscription_status === 'active' ? 'bg-green-500' : 'bg-gray-500'
+              }`}>
               {profile?.subscription_status === 'active' ? 'ACTIVE' : 'FREE'}
             </span>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div>
-              <p className="text-gray-400 text-sm">Plan</p>
-              <p className="text-white font-medium">
+              <p className="text-gray-400 text-sm mb-1">Plan Name</p>
+              <p className="text-white font-medium text-lg">
                 {currentPlan?.name || 'Free Plan'}
               </p>
             </div>
             <div>
-              <p className="text-gray-400 text-sm">Credits</p>
-              <p className="text-yellow-400 font-medium">
+              <p className="text-gray-400 text-sm mb-1">Monthly Credits</p>
+              <p className="text-yellow-400 font-medium text-lg">
                 {profile?.remaining_credits || 0} / {profile?.total_credits || 0}
               </p>
             </div>
             <div>
-              <p className="text-gray-400 text-sm">
-                {profile?.subscription_status === 'active' ? 'Expires' : 'Status'}
+              <p className="text-gray-400 text-sm mb-1">Next Credit Reset</p>
+              <p className="text-white font-medium">
+                {getNextResetDate()}
               </p>
-              <p className="text-white">
-                {profile?.subscription_end_date 
-                  ? new Date(profile.subscription_end_date).toLocaleDateString()
+            </div>
+            <div>
+              <p className="text-gray-400 text-sm mb-1">
+                {profile?.subscription_status === 'active' ? 'Plan Expires' : 'Status'}
+              </p>
+              <p className="text-white font-medium">
+                {profile?.subscription_end_date
+                  ? new Date(profile.subscription_end_date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })
                   : 'No expiration'
                 }
               </p>
@@ -79,175 +83,60 @@ export default function BillingSection({ profile, onProfileUpdate }: BillingSect
 
           {/* Usage Progress */}
           {profile?.total_credits > 0 && (
-            <div className="mt-4">
+            <div className="mt-6">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-400">Credit Usage</span>
+                <span className="text-gray-400">Credit Usage This Month</span>
                 <span className="text-gray-400">
-                  {((profile.total_credits - profile.remaining_credits) / profile.total_credits * 100).toFixed(0)}%
+                  {((profile.total_credits - profile.remaining_credits) / profile.total_credits * 100).toFixed(0)}% used
                 </span>
               </div>
-              <div className="w-full bg-gray-700 rounded-full h-2">
-                <div 
-                  className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
-                  style={{ 
-                    width: `${((profile.total_credits - profile.remaining_credits) / profile.total_credits * 100)}%` 
+              <div className="w-full bg-gray-700 rounded-full h-3">
+                <div
+                  className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-3 rounded-full transition-all duration-300"
+                  style={{
+                    width: `${((profile.total_credits - profile.remaining_credits) / profile.total_credits * 100)}%`
                   }}
                 ></div>
               </div>
-            </div>
-          )}
-        </div>
-
-        {/* Billing Cycle Toggle */}
-        <div className="mb-6">
-          <div className="flex items-center justify-center">
-            <div className="bg-[#1a1a1a] rounded-lg p-1 flex">
-              <button
-                onClick={() => setBillingCycle('monthly')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  billingCycle === 'monthly'
-                    ? 'bg-yellow-400 text-black'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                Monthly
-              </button>
-              <button
-                onClick={() => setBillingCycle('yearly')}
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  billingCycle === 'yearly'
-                    ? 'bg-yellow-400 text-black'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                Yearly
-                <span className="ml-1 text-xs bg-green-500 text-white px-1.5 py-0.5 rounded-full">
-                  Save 20%
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Available Plans */}
-        <div>
-          <h3 className="text-lg font-medium mb-4">Available Plans</h3>
-          
-          {loading ? (
-            <div className="bg-[#1a1a1a] rounded-lg p-6">
-              <div className="animate-pulse">
-                <div className="h-4 bg-gray-700 rounded w-1/4 mb-4"></div>
-                <div className="space-y-2">
-                  <div className="h-3 bg-gray-700 rounded w-3/4"></div>
-                  <div className="h-3 bg-gray-700 rounded w-1/2"></div>
-                </div>
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>{profile.total_credits - profile.remaining_credits} credits used</span>
+                <span>{profile.remaining_credits} credits remaining</span>
               </div>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {plans.map((plan) => {
-                const isCurrentPlan = currentPlan?.id === plan.id;
-                const price = billingCycle === 'yearly' && plan.price_yearly 
-                  ? plan.price_yearly 
-                  : plan.price_monthly;
-                const originalPrice = billingCycle === 'yearly' 
-                  ? plan.price_monthly * 12 
-                  : plan.price_monthly;
-                
-                return (
-                  <motion.div
-                    key={plan.id}
-                    className={`bg-[#1a1a1a] rounded-lg p-6 border-2 transition-colors ${
-                      isCurrentPlan 
-                        ? 'border-yellow-400' 
-                        : plan.is_popular 
-                        ? 'border-blue-500' 
-                        : 'border-gray-700 hover:border-gray-600'
-                    }`}
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    {/* Plan Header */}
-                    <div className="text-center mb-4">
-                      <h4 className="text-lg font-semibold text-white mb-1">
-                        {plan.name}
-                      </h4>
-                      <p className="text-gray-400 text-sm">{plan.tag}</p>
-                      
-                      {/* Price */}
-                      <div className="mt-4">
-                        {plan.price_monthly === 0 ? (
-                          <div className="text-2xl font-bold text-white">Free</div>
-                        ) : (
-                          <div>
-                            <div className="text-2xl font-bold text-white">
-                              ₹{price}
-                              <span className="text-sm font-normal text-gray-400">
-                                /{billingCycle === 'yearly' ? 'year' : 'month'}
-                              </span>
-                            </div>
-                            {billingCycle === 'yearly' && plan.price_yearly && (
-                              <div className="text-sm text-green-400">
-                                Save ₹{originalPrice - plan.price_yearly} yearly
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Features */}
-                    <div className="space-y-2 mb-6">
-                      <div className="text-sm text-gray-300">
-                        <span className="font-medium text-yellow-400">
-                          {plan.credits_per_month}
-                        </span> credits per month
-                      </div>
-                      <div className="text-sm text-gray-300">
-                        Up to <span className="font-medium">
-                          {plan.max_interviews_per_month}
-                        </span> interviews
-                      </div>
-                      
-                      {plan.features && plan.features.length > 0 && (
-                        <div className="space-y-1 mt-3">
-                          {plan.features.slice(0, 3).map((feature: string, index: number) => (
-                            <div key={index} className="flex items-center text-sm text-gray-300">
-                              <svg className="w-4 h-4 text-green-400 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                              </svg>
-                              {feature}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Action Button */}
-                    <div>
-                      {isCurrentPlan ? (
-                        <div className="w-full py-2 text-center text-gray-400 border border-gray-600 rounded-lg">
-                          Current Plan
-                        </div>
-                      ) : plan.price_monthly === 0 ? (
-                        <div className="w-full py-2 text-center text-gray-400 border border-gray-600 rounded-lg">
-                          Free Plan
-                        </div>
-                      ) : (
-                        <PaymentButton
-                          plan={plan}
-                          buttonText="Upgrade"
-                          buttonStyle={plan.is_popular ? 'primary' : 'secondary'}
-                          billingCycle={billingCycle}
-                          onSuccess={onProfileUpdate}
-                        />
-                      )}
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
           )}
+        </div>
+
+        {/* Customer Support */}
+        <div className="bg-[#1a1a1a] rounded-lg p-6">
+          <h3 className="text-lg font-medium mb-4">Customer Support</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Phone Support</p>
+                <a href="tel:+919653814628" className="text-white font-medium hover:text-yellow-400 transition-colors">
+                  +91 9653814628
+                </a>
+              </div>
+            </div>
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-gray-400 text-sm">Email Support</p>
+                <a href="mailto:akshayrajput2616@gmail.com" className="text-white font-medium hover:text-yellow-400 transition-colors">
+                  akshayrajput2616@gmail.com
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

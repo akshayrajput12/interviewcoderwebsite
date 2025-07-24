@@ -36,8 +36,8 @@ export default function UndetectabilitySection() {
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
         >
-          Watch this real job offer from Amazon using Interview Coder. Throughout the whole 
-          video, you'll see how our Interview Coder AI tool has the full and final round.
+          Watch this real job offer from Amazon using GhostCoder. Throughout the whole 
+          video, you'll see how our GhostCoder AI tool has the full and final round.
         </motion.p>
 
         {/* Video Player - Exact match to image */}
@@ -165,7 +165,7 @@ export default function UndetectabilitySection() {
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
         >
-          Here's how we ensure that Interview Coder is undetectable during technical interviews.
+          Here's how we ensure that GhostCoder is undetectable during technical interviews.
         </motion.p>
 
         {/* PRO Badge with Yellow Lines */}

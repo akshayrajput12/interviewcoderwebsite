@@ -7,6 +7,7 @@ import Header from '@/app/home/home-components/Header';
 import Footer from '@/app/home/home-components/Footer';
 import BillingSection from '@/components/settings/BillingSection';
 import CreditsSection from '@/components/settings/CreditsSection';
+import PricingCards from '@/components/pricing/PricingCards';
 
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('account');
@@ -79,10 +80,12 @@ export default function SettingsPage() {
       
       <div className="pt-20 pb-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-8">
+          <div className="flex flex-col lg:flex-row gap-8">
             {/* Sidebar */}
-            <div className="w-64 flex-shrink-0">
+            <div className="w-full lg:w-64 flex-shrink-0">
               <div className="bg-[#1a1a1a] rounded-lg p-1">
+                {/* Mobile: Horizontal scrolling tabs */}
+                <div className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-x-visible">
                 <button
                   onClick={() => setActiveTab('account')}
                   className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
@@ -92,6 +95,16 @@ export default function SettingsPage() {
                   }`}
                 >
                   Account
+                </button>
+                <button
+                  onClick={() => setActiveTab('pricing')}
+                  className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-colors ${
+                    activeTab === 'pricing'
+                      ? 'bg-[#333] text-white'
+                      : 'text-gray-400 hover:text-white hover:bg-[#2a2a2a]'
+                  }`}
+                >
+                  Pricing
                 </button>
                 {/* Only show billing tab for paid users */}
                 {profile?.subscription_status === 'active' && (
@@ -119,6 +132,7 @@ export default function SettingsPage() {
                     Credits
                   </button>
                 )}
+                </div>
               </div>
             </div>
 
@@ -233,6 +247,24 @@ export default function SettingsPage() {
                   profile={profile}
                   onProfileUpdate={fetchProfile}
                 />
+              )}
+
+              {activeTab === 'pricing' && (
+                <div className="space-y-8">
+                  <div className="text-center mb-10">
+                    <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-white">
+                      Pricing Plans
+                    </h2>
+                    <p className="text-gray-400 text-lg">
+                      Simple and transparent pricing for everyone.
+                    </p>
+                  </div>
+                  
+                  {/* Pricing Cards - Same as landing page */}
+                  <div className="max-w-5xl mx-auto">
+                    <PricingCards />
+                  </div>
+                </div>
               )}
 
               {activeTab === 'credits' && profile?.subscription_status === 'active' && (

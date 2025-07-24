@@ -10,7 +10,7 @@ const faqData = [
     category: 'Getting Started',
     questions: [
       {
-        question: 'How do I start using Interview Coder?',
+        question: 'How do I start using GhostCoder?',
         answer: 'Simply sign up for a free account and you\'ll get 50 free credits to start practicing. You can then choose from various interview types and difficulty levels.'
       },
       {
@@ -52,8 +52,8 @@ const faqData = [
         answer: 'Click on "Forgot Password" on the login page and enter your email address. You\'ll receive a password reset link in your email.'
       },
       {
-        question: 'Can I use Interview Coder on mobile devices?',
-        answer: 'Yes, Interview Coder is fully responsive and works on all devices including smartphones and tablets.'
+        question: 'Can I use GhostCoder on mobile devices?',
+        answer: 'Yes, GhostCoder is fully responsive and works on all devices including smartphones and tablets.'
       }
     ]
   },
@@ -202,7 +202,7 @@ export default function HelpPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href="mailto:support@interviewcoder.com"
+                  href="mailto:support@ghostcoder.com"
                   className="bg-yellow-400 text-black px-6 py-3 rounded-lg hover:bg-yellow-500 transition-colors font-medium"
                 >
                   Email Support

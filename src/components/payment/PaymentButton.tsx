@@ -102,7 +102,7 @@ export default function PaymentButton({
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: orderData.order.amount,
         currency: orderData.order.currency,
-        name: 'Interview Coder',
+        name: 'GhostCoder',
         description: orderData.plan.description,
         order_id: orderData.order.id,
         prefill: {
