@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Local Downloads - GhostCoder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #1a1a1a;
+            color: white;
+        }
+        .download-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            margin: 10px;
+            background: linear-gradient(45deg, #F8E71C, #FFD700);
+            color: black;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        .download-btn:hover {
+            transform: scale(1.05);
+        }
+        .info {
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: #2d5a2d; }
+        .error { background: #5a2d2d; }
+    </style>
+</head>
+<body>
+    <h1>🚀 GhostCoder Local Downloads Test</h1>
+    
+    <div class="info">
+        <h3>Local File Downloads</h3>
+        <p>These downloads use files stored locally in your codebase with Git LFS:</p>
+        <ul>
+            <li><strong>Windows:</strong> /downloads/GhostCoder Setup 1.1.0.exe</li>
+            <li><strong>macOS:</strong> /downloads/GhostCoder-1.1.0.dmg</li>
+        </ul>
+    </div>
+
+    <div>
+        <h3>Windows Installer</h3>
+        <button onclick="downloadWindows()" class="download-btn">
+            💻 Download for Windows
+        </button>
+        <div id="windows-status" class="status" style="display: none;"></div>
+    </div>
+
+    <div>
+        <h3>macOS Installer</h3>
+        <button onclick="downloadMac()" class="download-btn">
+            🚀 Download for macOS
+        </button>
+        <div id="mac-status" class="status" style="display: none;"></div>
+    </div>
+
+    <div class="info">
+        <h3>✅ What to expect:</h3>
+        <ul>
+            <li>Click button → File downloads immediately from your domain</li>
+            <li>No external redirects or third-party services</li>
+            <li>Fast downloads served by your hosting provider</li>
+            <li>Download analytics logged to console</li>
+        </ul>
+        
+        <h3>🔧 If downloads don't work:</h3>
+        <ol>
+            <li>Check if files exist in <code>public/downloads/</code></li>
+            <li>Verify Git LFS is properly set up</li>
+            <li>Ensure files were committed with Git LFS</li>
+            <li>Check browser console for errors</li>
+        </ol>
+    </div>
+
+    <script>
+        function showStatus(elementId, message, isError = false) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${isError ? 'error' : 'success'}`;
+            element.style.display = 'block';
+            
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 3000);
+        }
+
+        function downloadWindows() {
+            try {
+                console.log('Starting Windows download...');
+                
+                const link = document.createElement('a');
+                link.href = '/downloads/GhostCoder Setup 1.1.0.exe';
+                link.download = 'GhostCoder Setup 1.1.0.exe';
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showStatus('windows-status', '✅ Windows download started!');
+                
+                // Log analytics
+                fetch('/api/download-analytics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        platform: 'windows',
+                        filename: 'GhostCoder Setup 1.1.0.exe',
+                        userAgent: navigator.userAgent
+                    })
+                }).catch(console.error);
+                
+            } catch (error) {
+                console.error('Windows download error:', error);
+                showStatus('windows-status', '❌ Download failed: ' + error.message, true);
+            }
+        }
+
+        function downloadMac() {
+            try {
+                console.log('Starting macOS download...');
+                
+                const link = document.createElement('a');
+                link.href = '/downloads/GhostCoder-1.1.0.dmg';
+                link.download = 'GhostCoder-1.1.0.dmg';
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                showStatus('mac-status', '✅ macOS download started!');
+                
+                // Log analytics
+                fetch('/api/download-analytics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        platform: 'mac',
+                        filename: 'GhostCoder-1.1.0.dmg',
+                        userAgent: navigator.userAgent
+                    })
+                }).catch(console.error);
+                
+            } catch (error) {
+                console.error('macOS download error:', error);
+                showStatus('mac-status', '❌ Download failed: ' + error.message, true);
+            }
+        }
+
+        // Test file existence on page load
+        window.addEventListener('load', async () => {
+            console.log('Testing file availability...');
+            
+            try {
+                const windowsResponse = await fetch('/downloads/GhostCoder Setup 1.1.0.exe', { method: 'HEAD' });
+                const macResponse = await fetch('/downloads/GhostCoder-1.1.0.dmg', { method: 'HEAD' });
+                
+                console.log('Windows file available:', windowsResponse.ok);
+                console.log('macOS file available:', macResponse.ok);
+            } catch (error) {
+                console.error('File availability check failed:', error);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { downloadWindows, downloadMac } from '@/constants/downloads';
 
 // Footer sections based on the image
 const legalLinks = [
@@ -47,10 +48,9 @@ const socialIcons = [
 ];
 
 export default function Footer() {
-  // Redirect functions
-  const redirectToAuth = () => {
-    window.location.href = '/signup';
-  };
+  // Download functions using centralized constants
+  const handleDownloadMac = downloadMac;
+  const handleDownloadWindows = downloadWindows;
 
   return (
     <motion.footer 
@@ -85,7 +85,7 @@ export default function Footer() {
             {/* Download CTAs */}
             <div className="flex flex-col sm:flex-row gap-3 mt-4 mb-4">
               <motion.button
-                onClick={redirectToAuth}
+                onClick={handleDownloadMac}
                 className="group relative bg-gradient-to-r from-[#F8E71C] to-[#FFD700] text-black font-semibold px-4 py-2 rounded-lg overflow-hidden cursor-pointer text-xs sm:text-sm"
                 whileHover={{
                   scale: 1.05,
@@ -96,12 +96,12 @@ export default function Footer() {
               >
                 <span className="relative z-10 flex items-center gap-2">
                   <span className="text-sm">🚀</span>
-                  Join Now - macOS
+                  Download for macOS
                 </span>
               </motion.button>
 
               <motion.button
-                onClick={redirectToAuth}
+                onClick={handleDownloadWindows}
                 className="group relative bg-transparent border border-[#F8E71C] text-[#F8E71C] font-semibold px-4 py-2 rounded-lg overflow-hidden cursor-pointer text-xs sm:text-sm"
                 whileHover={{
                   scale: 1.05,
@@ -114,7 +114,7 @@ export default function Footer() {
               >
                 <span className="relative z-10 flex items-center gap-2">
                   <span className="text-sm">💻</span>
-                  Join Now - Windows
+                  Download for Windows
                 </span>
               </motion.button>
             </div>

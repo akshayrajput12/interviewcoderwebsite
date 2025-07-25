@@ -1,12 +1,12 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { downloadWindows, downloadMac } from '@/constants/downloads';
 
 export default function CTASection() {
-  // Redirect functions
-  const redirectToAuth = () => {
-    window.location.href = '/signup';
-  };
+  // Download functions using centralized constants
+  const handleDownloadMac = downloadMac;
+  const handleDownloadWindows = downloadWindows;
   // Define keyboard layout exactly as in the image
   const row1 = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
   const row2 = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '[', ']'];
@@ -198,7 +198,7 @@ export default function CTASection() {
           viewport={{ once: true }}
         >
           <motion.button
-            onClick={redirectToAuth}
+            onClick={handleDownloadMac}
             className="group relative bg-gradient-to-r from-[#F8E71C] to-[#FFD700] text-black font-semibold px-4 py-2 rounded-lg overflow-hidden cursor-pointer text-xs sm:text-sm"
             whileHover={{
               scale: 1.05,
@@ -209,12 +209,12 @@ export default function CTASection() {
           >
             <span className="relative z-10 flex items-center gap-2">
               <span className="text-sm">🚀</span>
-              Join Now - macOS
+              Download for macOS
             </span>
           </motion.button>
 
           <motion.button
-            onClick={redirectToAuth}
+            onClick={handleDownloadWindows}
             className="group relative bg-transparent border border-[#F8E71C] text-[#F8E71C] font-semibold px-4 py-2 rounded-lg overflow-hidden cursor-pointer text-xs sm:text-sm"
             whileHover={{
               scale: 1.05,
@@ -227,7 +227,7 @@ export default function CTASection() {
           >
             <span className="relative z-10 flex items-center gap-2">
               <span className="text-sm">💻</span>
-              Join Now - Windows
+              Download for Windows
             </span>
           </motion.button>
         </motion.div>
