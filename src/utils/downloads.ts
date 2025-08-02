@@ -1,5 +1,5 @@
 import { supabaseClient } from './supabase-client';
-import { downloadFromGoogleDrive, generateGoogleDriveDownloadUrl } from './google-drive';
+import { downloadFromGoogleDrive } from './google-drive';
 
 export interface DownloadFile {
   id: string;

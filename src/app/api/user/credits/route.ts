@@ -103,9 +103,9 @@ export async function POST(request: Request) {
     }
 
     // Use the database function to use credits
-    const { data, error } = await supabase.rpc(
+    const { error } = await supabase.rpc(
       'use_credits',
-      { 
+      {
         user_id: session.user.id,
         credits_to_use: credits,
         description: description || 'Credit usage'

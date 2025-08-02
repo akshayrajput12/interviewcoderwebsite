@@ -38,7 +38,7 @@ export default function DownloadsAdmin() {
       const filePath = `downloads/${fileName}`;
 
       // Upload file to Supabase storage
-      const { data: uploadData, error: uploadError } = await supabaseClient.storage
+      const { error: uploadError } = await supabaseClient.storage
         .from('downloads')
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -198,7 +198,7 @@ export default function DownloadsAdmin() {
                 <p><strong>How to get Google Drive URL:</strong></p>
                 <ol className="list-decimal list-inside mt-1 space-y-1">
                   <li>Upload your file to Google Drive</li>
-                  <li>Right-click the file → Share → Change to "Anyone with the link"</li>
+                  <li>Right-click the file → Share → Change to &ldquo;Anyone with the link&rdquo;</li>
                   <li>Copy the share link and paste it above</li>
                 </ol>
               </div>

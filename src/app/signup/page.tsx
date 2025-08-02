@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Header from '../home/home-components/Header';
 import Footer from '../home/home-components/Footer';
 import { useAuth } from '@/context/AuthContext';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 function SignupContent() {
   const [email, setEmail] = useState('');
@@ -15,39 +15,10 @@ function SignupContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { signUp, signInWithGoogle, signInWithGithub, session } = useAuth();
+  const { signUp, signInWithGoogle, signInWithGithub } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
 
-  // Check if this is a desktop authentication flow
-  const isDesktopAuth = searchParams.get('desktop_auth') === 'true';
-  const desktopState = searchParams.get('state');
 
-  // Handle desktop authentication completion
-  useEffect(() => {
-    const handleDesktopAuthCompletion = async () => {
-      if (isDesktopAuth && desktopState && session) {
-        try {
-          // Complete the desktop authentication
-          await fetch('/api/auth/desktop/complete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ state: desktopState, session })
-          });
-
-          // Redirect to desktop app
-          window.location.href = `ghostcoder://auth?success=true&state=${desktopState}`;
-          // Fallback redirect after a short delay
-          setTimeout(() => router.push('/'), 1000);
-        } catch (error) {
-          console.error('Desktop auth completion error:', error);
-          setError('Failed to complete desktop authentication');
-        }
-      }
-    };
-
-    handleDesktopAuthCompletion();
-  }, [isDesktopAuth, desktopState, session, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,11 +59,8 @@ function SignupContent() {
         }
       }
       
-      // If this is desktop auth, the useEffect will handle completion
-      // Otherwise, redirect to home page
-      if (!isDesktopAuth) {
-        router.push('/');
-      }
+      // Redirect to home page
+      router.push('/');
       setIsLoading(false);
     } catch (err) {
       console.error('Signup error:', err);
@@ -105,7 +73,7 @@ function SignupContent() {
     setError(null);
     setSocialLoading('google');
     try {
-      const { error } = await signInWithGoogle(isDesktopAuth);
+      const { error } = await signInWithGoogle();
       if (error) {
         setError(error instanceof Error ? error.message : 'Google sign-in failed');
         setSocialLoading(null);
@@ -122,7 +90,7 @@ function SignupContent() {
     setError(null);
     setSocialLoading('github');
     try {
-      const { error } = await signInWithGithub(isDesktopAuth);
+      const { error } = await signInWithGithub();
       if (error) {
         setError(error instanceof Error ? error.message : 'GitHub sign-in failed');
         setSocialLoading(null);

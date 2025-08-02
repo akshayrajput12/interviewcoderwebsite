@@ -1,15 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import PaymentButton from '@/components/payment/PaymentButton';
+interface UserProfile {
+  email?: string;
+  full_name?: string;
+  subscription_plan?: {
+    name?: string;
+  };
+  subscription_status?: string;
+  subscription_end_date?: string;
+  subscription_start_date?: string;
+  total_credits?: number;
+  used_credits?: number;
+  remaining_credits?: number;
+  subscription_plan_id?: number;
+}
 
 interface BillingSectionProps {
-  profile: any;
+  profile: UserProfile;
   onProfileUpdate: () => void;
 }
 
-export default function BillingSection({ profile, onProfileUpdate }: BillingSectionProps) {
+export default function BillingSection({ profile }: BillingSectionProps) {
   const currentPlan = profile?.subscription_plan;
 
   // Calculate next credit reset date (assuming monthly reset)
@@ -82,25 +93,25 @@ export default function BillingSection({ profile, onProfileUpdate }: BillingSect
           </div>
 
           {/* Usage Progress */}
-          {profile?.total_credits > 0 && (
+          {profile?.total_credits && profile.total_credits > 0 && (
             <div className="mt-6">
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-gray-400">Credit Usage This Month</span>
                 <span className="text-gray-400">
-                  {((profile.total_credits - profile.remaining_credits) / profile.total_credits * 100).toFixed(0)}% used
+                  {(((profile.total_credits - (profile.remaining_credits || 0)) / profile.total_credits) * 100).toFixed(0)}% used
                 </span>
               </div>
               <div className="w-full bg-gray-700 rounded-full h-3">
                 <div
                   className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-3 rounded-full transition-all duration-300"
                   style={{
-                    width: `${((profile.total_credits - profile.remaining_credits) / profile.total_credits * 100)}%`
+                    width: `${((profile.total_credits - (profile.remaining_credits || 0)) / profile.total_credits) * 100}%`
                   }}
                 ></div>
               </div>
               <div className="flex justify-between text-xs text-gray-500 mt-1">
-                <span>{profile.total_credits - profile.remaining_credits} credits used</span>
-                <span>{profile.remaining_credits} credits remaining</span>
+                <span>{profile.total_credits - (profile.remaining_credits || 0)} credits used</span>
+                <span>{profile.remaining_credits || 0} credits remaining</span>
               </div>
             </div>
           )}

@@ -65,10 +65,10 @@ const ghostCoder = {
                         </div>
 
                         <p className="text-gray-300 mb-4">
-                            Unlike browser extensions or plugins that can be detected, GhostCoder runs as a separate application on your computer. It doesn't modify your browser or inject any code that could be detected.
+                            Unlike browser extensions or plugins that can be detected, GhostCoder runs as a separate application on your computer. It doesn&apos;t modify your browser or inject any code that could be detected.
                         </p>
                         <p className="text-gray-300">
-                            This means that even the most sophisticated monitoring tools can't detect that you're using GhostCoder during your technical interviews.
+                            This means that even the most sophisticated monitoring tools can&apos;t detect that you&apos;re using GhostCoder during your technical interviews.
                         </p>
                     </motion.section>
 

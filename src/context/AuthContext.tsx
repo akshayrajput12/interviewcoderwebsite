@@ -10,12 +10,9 @@ type AuthContextType = {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: unknown }>;
   signUp: (email: string, password: string) => Promise<{ error: unknown, user: User | null }>;
-  signInWithGoogle: (desktopAuth?: boolean) => Promise<{ error: unknown }>;
-  signInWithGithub: (desktopAuth?: boolean) => Promise<{ error: unknown }>;
+  signInWithGoogle: () => Promise<{ error: unknown }>;
+  signInWithGithub: () => Promise<{ error: unknown }>;
   signOut: () => Promise<void>;
-  // Desktop app authentication methods
-  initiateDesktopAuth: () => Promise<{ success: boolean; authUrl?: string; state?: string; error?: string }>;
-  checkDesktopAuthStatus: (state: string) => Promise<{ success: boolean; authenticated: boolean; session?: unknown; error?: string }>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -77,15 +74,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error, user: data?.user || null };
   };
 
-  const signInWithGoogle = async (desktopAuth = false) => {
-    const redirectTo = desktopAuth
-      ? `${window.location.origin}/login/auth/desktop/callback`
-      : `${window.location.origin}/auth/callback`;
-
+  const signInWithGoogle = async () => {
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo,
+        redirectTo: `${window.location.origin}/auth/callback`,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -95,59 +88,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error };
   };
 
-  const signInWithGithub = async (desktopAuth = false) => {
-    const redirectTo = desktopAuth
-      ? `${window.location.origin}/login/auth/desktop/callback`
-      : `${window.location.origin}/auth/callback`;
-
+  const signInWithGithub = async () => {
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider: 'github',
       options: {
-        redirectTo
+        redirectTo: `${window.location.origin}/auth/callback`
       }
     });
     return { error };
   };
 
-  // Desktop app authentication methods
-  const initiateDesktopAuth = async () => {
-    try {
-      const response = await fetch('/api/auth/desktop', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'initiate' })
-      });
 
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Desktop auth initiation error:', error);
-      return {
-        success: false,
-        error: 'Failed to initiate desktop authentication'
-      };
-    }
-  };
-
-  const checkDesktopAuthStatus = async (state: string) => {
-    try {
-      const response = await fetch('/api/auth/desktop', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'check', state })
-      });
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Desktop auth status check error:', error);
-      return {
-        success: false,
-        authenticated: false,
-        error: 'Failed to check authentication status'
-      };
-    }
-  };
 
   const signOut = async () => {
     await supabaseClient.auth.signOut();
@@ -162,8 +113,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signInWithGoogle,
     signInWithGithub,
     signOut,
-    initiateDesktopAuth,
-    checkDesktopAuthStatus,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

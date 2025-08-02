@@ -48,7 +48,7 @@ export default function ConfirmSignupPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.5 }}
           >
-            We've sent a confirmation link to your email address. Please click the link to verify your account.
+            We&apos;ve sent a confirmation link to your email address. Please click the link to verify your account.
           </motion.p>
           
           {/* Buttons */}

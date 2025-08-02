@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 
 // Get all available subscription plans
-export async function GET(request: Request) {
+export async function GET() {
   try {
     // Initialize Supabase client with cookies
     const cookieStore = await cookies();
@@ -16,10 +16,10 @@ export async function GET(request: Request) {
           get(name: string) {
             return cookieStore.get(name)?.value;
           },
-          set(name: string, value: string, options: any) {
+          set(name: string, value: string, options: Record<string, any>) {
             cookieStore.set({ name, value, ...options });
           },
-          remove(name: string, options: any) {
+          remove(name: string, options: Record<string, any>) {
             cookieStore.set({ name, value: '', ...options });
           },
         },
@@ -36,12 +36,21 @@ export async function GET(request: Request) {
     // Format the plans to match the frontend structure
     const formattedPlans = plans?.map(plan => ({
       ...plan,
-      price: `${plan.currency}${plan.price_monthly}`,
+      id: plan.id.toString(),
+      price: plan.price_monthly,
       period: '/ month',
       annualBilling: plan.price_yearly ? `Billed annually (${plan.currency}${plan.price_yearly}/year)` : null,
-      buttonText: plan.price_monthly === 0 ? 'Get Started' : 'Subscribe',
+      buttonText: plan.tag === 'One-Time Pro' ? 'Buy Once - ₹49' :
+                  plan.price_monthly === 0 ? 'Get Started' : 'Subscribe',
       buttonStyle: plan.is_popular ? 'primary' : 'secondary',
-      popular: plan.is_popular
+      popular: plan.is_popular,
+      credits: plan.tag === 'One-Time Pro' ? 5 : plan.credits_per_month, // Show 5 credits for one-time pro
+      credits_per_month: plan.tag === 'One-Time Pro' ? 5 : plan.credits_per_month, // Override for one-time pro
+      billing_cycle: plan.tag === 'One-Time Pro' ? 'one-time' :
+                     plan.price_yearly ? 'yearly' : 'monthly',
+      // Ensure features is always an array
+      features: Array.isArray(plan.features) ? plan.features :
+                typeof plan.features === 'string' ? JSON.parse(plan.features) : []
     }));
 
     if (error) {

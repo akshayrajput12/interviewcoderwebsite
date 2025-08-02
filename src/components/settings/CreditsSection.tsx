@@ -3,8 +3,22 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
+interface UserProfile {
+  email?: string;
+  full_name?: string;
+  subscription_plan?: {
+    name?: string;
+  };
+  subscription_status?: string;
+  subscription_end_date?: string;
+  total_credits?: number;
+  used_credits?: number;
+  remaining_credits?: number;
+  subscription_plan_id?: number;
+}
+
 interface CreditsSectionProps {
-  profile: any;
+  profile: UserProfile;
 }
 
 interface CreditTransaction {
@@ -170,25 +184,25 @@ export default function CreditsSection({ profile }: CreditsSectionProps) {
       </div>
 
       {/* Usage Progress */}
-      {profile?.total_credits > 0 && (
+      {profile?.total_credits && profile.total_credits > 0 && (
         <div className="bg-[#1a1a1a] rounded-lg p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-medium text-white">Credit Usage</h3>
             <span className="text-sm text-gray-400">
-              {((profile.total_credits - profile.remaining_credits) / profile.total_credits * 100).toFixed(1)}% used
+              {(((profile.total_credits - (profile.remaining_credits || 0)) / profile.total_credits) * 100).toFixed(1)}% used
             </span>
           </div>
           <div className="w-full bg-gray-700 rounded-full h-3">
-            <div 
+            <div
               className="bg-gradient-to-r from-yellow-400 to-yellow-500 h-3 rounded-full transition-all duration-500"
-              style={{ 
-                width: `${Math.min(((profile.total_credits - profile.remaining_credits) / profile.total_credits * 100), 100)}%` 
+              style={{
+                width: `${Math.min(((profile.total_credits - (profile.remaining_credits || 0)) / profile.total_credits * 100), 100)}%`
               }}
             ></div>
           </div>
           <div className="flex justify-between text-sm text-gray-400 mt-2">
             <span>0</span>
-            <span>{profile.total_credits}</span>
+            <span>{profile.total_credits || 0}</span>
           </div>
         </div>
       )}

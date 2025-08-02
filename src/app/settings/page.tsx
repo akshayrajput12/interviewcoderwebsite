@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Header from '@/app/home/home-components/Header';
@@ -9,9 +9,23 @@ import BillingSection from '@/components/settings/BillingSection';
 import CreditsSection from '@/components/settings/CreditsSection';
 import PricingCards from '@/components/pricing/PricingCards';
 
+interface UserProfile {
+  email?: string;
+  full_name?: string;
+  subscription_plan?: {
+    name?: string;
+  };
+  subscription_status?: string;
+  subscription_end_date?: string;
+  total_credits?: number;
+  used_credits?: number;
+  remaining_credits?: number;
+  subscription_plan_id?: number;
+}
+
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('account');
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -26,7 +40,7 @@ export default function SettingsPage() {
   }, [user, authLoading, router]);
 
   // Fetch user profile data
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -40,13 +54,13 @@ export default function SettingsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     if (user) {
       fetchProfile();
     }
-  }, [user]);
+  }, [user, fetchProfile]);
 
   // Show loading state
   if (authLoading || loading) {

@@ -5,13 +5,18 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { platform, filename, userAgent } = body;
 
+    // Get IP address from headers
+    const ip = request.headers.get('x-forwarded-for') ||
+               request.headers.get('x-real-ip') ||
+               'unknown';
+
     // Log download analytics (you can extend this to save to database)
     console.log('Download Analytics:', {
       platform,
       filename,
       userAgent,
       timestamp: new Date().toISOString(),
-      ip: request.ip || 'unknown'
+      ip
     });
 
     // You can save this to your database here

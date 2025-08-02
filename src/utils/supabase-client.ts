@@ -1,6 +1,6 @@
 'use client';
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, Session } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -139,7 +139,7 @@ export const ensureFreshSession = async () => {
 };
 
 // Helper function to sync session to cookies
-export const syncSessionToCookies = (session: any) => {
+export const syncSessionToCookies = (session: Session) => {
   if (typeof window === 'undefined' || !session) return;
 
   try {
@@ -152,7 +152,7 @@ export const syncSessionToCookies = (session: any) => {
     });
 
     // Set cookie with proper attributes
-    const expires = new Date(session.expires_at * 1000);
+    const expires = new Date((session.expires_at || Date.now() / 1000 + 3600) * 1000);
     document.cookie = `${cookieName}=${encodeURIComponent(cookieValue)}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
 
     console.log('Synced session to cookie for server-side access');

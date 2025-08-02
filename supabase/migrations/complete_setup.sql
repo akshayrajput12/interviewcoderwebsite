@@ -37,18 +37,18 @@ CREATE TABLE IF NOT EXISTS public.subscription_plans (
 
 -- Insert subscription plans
 INSERT INTO public.subscription_plans (name, tag, description, price_monthly, price_yearly, credits_per_month, max_interviews_per_month, features, is_popular, highlight_text)
-VALUES 
+VALUES
   (
-    'GhostCoder', 
-    'Free', 
-    'Try it and see', 
-    0, 
-    0, 
-    0, 
-    5, 
-    '["Test visibility in screen sharing", "Basic interface access", "No credits included", "Limited functionality"]',
+    'Interview Coder Pro',
+    'One-Time Pro',
+    'One-time upgrade with 5 credits - No monthly subscription needed',
+    49,
+    null,
+    0, -- This is NOT monthly credits, it's a one-time credit grant
+    10,
+    '["5 one-time credits (not monthly)", "Pro plan features", "Advanced AI models", "Priority support", "Undetectable in all platforms", "One purchase per user only"]',
     false,
-    null
+    'One-time offer - 5 credits for ₹49'
   ),
   (
     'GhostCoder', 
@@ -107,6 +107,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   credit_reset_date TIMESTAMP WITH TIME ZONE,    -- When credits reset next
   total_lifetime_credits INTEGER DEFAULT 0,      -- Total credits ever received
   total_lifetime_used INTEGER DEFAULT 0,         -- Total credits ever used
+  has_purchased_one_time_pro BOOLEAN DEFAULT false, -- Track one-time pro purchase
+  one_time_pro_purchase_date TIMESTAMP WITH TIME ZONE, -- When one-time pro was purchased
+  one_time_credits_total INTEGER DEFAULT 0,      -- Total one-time credits received (5 for pro)
+  one_time_credits_used INTEGER DEFAULT 0,       -- One-time credits used so far
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
@@ -131,7 +135,7 @@ CREATE TABLE IF NOT EXISTS public.payment_orders (
   plan_id INTEGER REFERENCES public.subscription_plans(id) NOT NULL,
   amount DECIMAL(10,2) NOT NULL,
   currency TEXT DEFAULT 'INR' NOT NULL,
-  billing_cycle TEXT DEFAULT 'monthly' CHECK (billing_cycle IN ('monthly', 'yearly')),
+  billing_cycle TEXT DEFAULT 'monthly' CHECK (billing_cycle IN ('monthly', 'yearly', 'one-time')),
   status TEXT DEFAULT 'created' CHECK (status IN ('created', 'paid', 'failed', 'cancelled')),
   payment_id TEXT,
   signature TEXT,
@@ -545,12 +549,121 @@ COMMENT ON FUNCTION public.process_monthly_credit_resets() IS 'Resets monthly cr
 COMMENT ON FUNCTION public.reset_monthly_credits(UUID) IS 'Resets monthly credits for a specific user (unused credits are lost)';
 COMMENT ON FUNCTION public.use_credits(UUID, INTEGER, TEXT) IS 'Uses credits with monthly limit enforcement';
 
+-- Create function to process one-time pro upgrade
+CREATE OR REPLACE FUNCTION public.process_one_time_pro_upgrade(
+  p_user_id UUID,
+  p_order_id TEXT,
+  p_payment_id TEXT,
+  p_signature TEXT
+)
+RETURNS BOOLEAN AS $$
+DECLARE
+  current_credits INTEGER;
+  plan_record RECORD;
+  pro_plan_id INTEGER;
+BEGIN
+  -- Check if user has already purchased one-time pro
+  IF EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = p_user_id AND has_purchased_one_time_pro = true
+  ) THEN
+    RAISE EXCEPTION 'User has already purchased one-time pro upgrade';
+  END IF;
+
+  -- Get the one-time pro plan details
+  SELECT * INTO plan_record
+  FROM public.subscription_plans
+  WHERE tag = 'One-Time Pro' AND is_active = true
+  LIMIT 1;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'One-time pro plan not found';
+  END IF;
+
+  -- Get current credits
+  SELECT COALESCE(current_month_credits, 0) INTO current_credits
+  FROM public.profiles
+  WHERE id = p_user_id;
+
+  -- Get a Pro plan ID (prefer the 999 rupees plan as it's marked popular)
+  SELECT id INTO pro_plan_id
+  FROM public.subscription_plans
+  WHERE tag = 'Pro' AND price_monthly = 999
+  LIMIT 1;
+
+  -- If no 999 plan found, get any Pro plan
+  IF pro_plan_id IS NULL THEN
+    SELECT id INTO pro_plan_id
+    FROM public.subscription_plans
+    WHERE tag = 'Pro'
+    LIMIT 1;
+  END IF;
+
+  -- Update payment order status
+  UPDATE public.payment_orders
+  SET
+    status = 'paid',
+    payment_id = p_payment_id,
+    signature = p_signature,
+    paid_at = now(),
+    updated_at = now()
+  WHERE order_id = p_order_id AND user_id = p_user_id;
+
+  -- Update user profile with one-time pro upgrade
+  UPDATE public.profiles
+  SET
+    has_purchased_one_time_pro = true,
+    one_time_pro_purchase_date = now(),
+    one_time_credits = COALESCE(one_time_credits, 0) + plan_record.credits_per_month,
+    current_month_credits = COALESCE(current_month_credits, 0) + plan_record.credits_per_month,
+    total_lifetime_credits = COALESCE(total_lifetime_credits, 0) + plan_record.credits_per_month,
+    subscription_plan_id = pro_plan_id, -- Set user to Pro plan
+    subscription_status = 'active', -- Set subscription as active
+    updated_at = now()
+  WHERE id = p_user_id;
+
+  -- Add credit transaction record
+  INSERT INTO public.credit_transactions (
+    profile_id,
+    transaction_type,
+    amount,
+    description,
+    month_year,
+    credits_after
+  )
+  VALUES (
+    p_user_id,
+    'credit',
+    plan_record.credits_per_month,
+    'One-time Pro upgrade - 5 credits',
+    to_char(now(), 'YYYY-MM'),
+    current_credits + plan_record.credits_per_month
+  );
+
+  RETURN TRUE;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Create function to check if user can purchase one-time pro
+CREATE OR REPLACE FUNCTION public.can_purchase_one_time_pro(p_user_id UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN NOT EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = p_user_id AND has_purchased_one_time_pro = true
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Add index for performance
+CREATE INDEX IF NOT EXISTS profiles_one_time_pro_idx ON public.profiles (has_purchased_one_time_pro);
+
 -- Complete setup message
 DO $$
 BEGIN
-  RAISE NOTICE 'GhostCoder database setup completed successfully!';
+  RAISE NOTICE 'Interview Coder database setup completed successfully!';
   RAISE NOTICE 'Features included:';
-  RAISE NOTICE '- Free plan with 0 credits';
+  RAISE NOTICE '- Interview Coder Pro: ₹49 one-time purchase with 5 credits (limited to one purchase per user)';
   RAISE NOTICE '- Pro yearly plan (₹999/month billed ₹11,988 annually) - 150 credits/month, no rollover';
   RAISE NOTICE '- Pro monthly plan (₹1,499/month) - 100 credits/month, no rollover';
   RAISE NOTICE '- Monthly credit limits with automatic reset (unused credits are lost)';
@@ -558,6 +671,7 @@ BEGIN
   RAISE NOTICE '- Row Level Security enabled';
   RAISE NOTICE '';
   RAISE NOTICE 'Credit System:';
+  RAISE NOTICE '- One-time Pro: 5 credits, one purchase per user';
   RAISE NOTICE '- Yearly plan: 150 credits per month, resets monthly, no rollover';
   RAISE NOTICE '- Monthly plan: 100 credits per month, resets monthly, no rollover';
   RAISE NOTICE '- Unused credits are lost at month end (use it or lose it)';

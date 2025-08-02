@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/utils/supabase';
 import { razorpay } from '@/lib/razorpay';
-import crypto from 'crypto';
 
 export async function POST(request: Request) {
   try {
@@ -49,12 +48,35 @@ export async function POST(request: Request) {
 
     console.log('Found plan:', plan.name, 'Price:', plan.price_monthly);
 
+    // Check if this is a one-time pro plan and user has already purchased it
+    if (plan.tag === 'One-Time Pro') {
+      const { data: canPurchase, error: checkError } = await supabase.rpc('can_purchase_one_time_pro', {
+        p_user_id: session.user.id
+      });
+
+      if (checkError) {
+        console.error('Error checking one-time pro eligibility:', checkError);
+        return NextResponse.json({ error: 'Failed to check purchase eligibility' }, { status: 500 });
+      }
+
+      if (!canPurchase) {
+        return NextResponse.json({
+          error: 'You have already purchased the one-time pro upgrade. This offer is limited to one purchase per user.'
+        }, { status: 400 });
+      }
+    }
+
     // Determine billing cycle and amount based on plan
     let amount: number;
     let description: string;
     let actualBillingCycle: string;
 
-    if (plan.price_monthly === 999) {
+    if (plan.price_monthly === 49 && plan.tag === 'One-Time Pro') {
+      // One-time pro plan - 49 rupees one-time payment
+      actualBillingCycle = 'one-time';
+      amount = plan.price_monthly * 100; // Convert to paise
+      description = `${plan.name} - One-time upgrade with 5 credits`;
+    } else if (plan.price_monthly === 999) {
       // 999/month plan - always bill yearly
       actualBillingCycle = 'yearly';
       const yearlyPrice = plan.price_yearly || (plan.price_monthly * 12);

@@ -5,11 +5,11 @@ import { motion } from 'framer-motion';
 import PaymentButton from '@/components/payment/PaymentButton';
 
 type Plan = {
-  id: number;
+  id: string;
   name: string;
   tag: string;
   description: string;
-  price: string;
+  price: number;
   period: string;
   annualBilling?: string;
   features: string[];
@@ -17,9 +17,11 @@ type Plan = {
   buttonStyle: 'primary' | 'secondary';
   popular: boolean;
   highlight_text?: string;
+  credits: number;
   credits_per_month: number;
   price_monthly: number;
   price_yearly?: number;
+  billing_cycle: string;
 };
 
 export default function PricingCards() {
@@ -76,33 +78,11 @@ export default function PricingCards() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-3 md:gap-5">
       {plans.map((plan, index) => {
-        // Determine billing cycle and pricing based on plan
-        let billingCycle: 'monthly' | 'yearly';
-        let price: number;
-        let displayPrice: string;
-        let displayPeriod: string;
-        let savings: number = 0;
-
-        if (plan.price_monthly === 999) {
-          // 999/month plan - bill yearly
-          billingCycle = 'yearly';
-          price = plan.price_yearly || (plan.price_monthly * 12);
-          displayPrice = `₹${plan.price_monthly}`;
-          displayPeriod = '/month';
-          savings = (plan.price_monthly * 12) - price;
-        } else if (plan.price_monthly === 1499) {
-          // 1499 plan - bill monthly
-          billingCycle = 'monthly';
-          price = plan.price_monthly;
-          displayPrice = `₹${plan.price_monthly}`;
-          displayPeriod = '/month';
-        } else {
-          // Free plan or other plans - default to monthly
-          billingCycle = 'monthly';
-          price = plan.price_monthly;
-          displayPrice = plan.price_monthly === 0 ? 'Free' : `₹${plan.price_monthly}`;
-          displayPeriod = plan.price_monthly === 0 ? '' : '/month';
-        }
+        // Determine pricing display
+        const displayPrice = plan.price_monthly === 0 ? 'Free' : `₹${plan.price_monthly}`;
+        const displayPeriod = plan.price_monthly === 0 ? '' :
+                             plan.tag === 'One-Time Pro' ? ' one-time' : '/month';
+        const yearlyPrice = plan.price_yearly || (plan.price_monthly * 12);
 
         return (
         <motion.div
@@ -153,9 +133,14 @@ export default function PricingCards() {
             </div>
 
             {/* Special messaging for different plans */}
+            {plan.price_monthly === 49 && plan.tag === 'One-Time Pro' && (
+              <div className="text-sm text-green-400 mt-1">
+                One-time purchase only
+              </div>
+            )}
             {plan.price_monthly === 999 && (
               <div className="text-sm text-blue-400 mt-1">
-                Billed annually (₹{price}/year)
+                Billed annually (₹{yearlyPrice}/year)
               </div>
             )}
             {plan.price_monthly === 1499 && (
@@ -178,7 +163,9 @@ export default function PricingCards() {
                 <span className="text-xs text-gray-300">Credits</span>
                 <span className="text-base font-bold text-white">
                   {plan.credits_per_month}
-                  <span className="text-xs text-gray-400 ml-1">/ month</span>
+                  <span className="text-xs text-gray-400 ml-1">
+                    {plan.tag === 'One-Time Pro' ? ' one-time' : '/ month'}
+                  </span>
                 </span>
               </div>
               <div className="mt-1.5 h-1.5 bg-gray-700 rounded-full overflow-hidden">
@@ -194,17 +181,34 @@ export default function PricingCards() {
           )}
 
           <ul className="space-y-2 mb-6">
-            {Array.isArray(plan.features) && plan.features.map((feature, featureIndex) => (
-              <li key={featureIndex} className="flex items-center text-gray-300 text-xs">
-                <span className={`mr-2 ${plan.credits_per_month === 0 && featureIndex < 2 ? 'text-gray-400' : 'text-green-400'}`}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M22 4L12 14.01l-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-                {feature}
-              </li>
-            ))}
+            {(() => {
+              // Safely parse features
+              let features: string[] = [];
+              try {
+                if (Array.isArray(plan.features)) {
+                  features = plan.features;
+                } else if (typeof plan.features === 'string') {
+                  features = JSON.parse(plan.features);
+                } else {
+                  features = [];
+                }
+              } catch (error) {
+                console.error('Error parsing features for plan:', plan.name, error);
+                features = [];
+              }
+
+              return features.map((feature: string, featureIndex: number) => (
+                <li key={featureIndex} className="flex items-center text-gray-300 text-xs">
+                  <span className={`mr-2 ${plan.credits_per_month === 0 && featureIndex < 2 ? 'text-gray-400' : 'text-green-400'}`}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M22 4L12 14.01l-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  {typeof feature === 'string' ? feature : String(feature)}
+                </li>
+              ));
+            })()}
           </ul>
 
           <PaymentButton

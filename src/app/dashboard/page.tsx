@@ -6,10 +6,39 @@ import { useRouter } from 'next/navigation';
 import Header from '../home/home-components/Header';
 import Footer from '../home/home-components/Footer';
 
+interface UserProfile {
+  email?: string;
+  full_name?: string;
+  subscription_plan?: string;
+  subscription_status?: string;
+  subscription_end_date?: string;
+  total_credits?: number;
+  used_credits?: number;
+  remaining_credits?: number;
+  interviews_this_month?: number;
+  subscription_plan_id?: number;
+}
+
+interface Transaction {
+  created_at: string;
+  transaction_type: string;
+  amount: number;
+  description: string;
+  balance_after: number;
+}
+
+interface Interview {
+  problem_title?: string;
+  status: string;
+  interview_type: string;
+  start_time: string;
+  credits_used: number;
+}
+
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
 
   // Redirect if not logged in - but only after loading is complete
@@ -20,9 +49,8 @@ export default function DashboardPage() {
     }
   }, [user, loading, router]);
 
-  const [profileData, setProfileData] = useState<any>(null);
-  const [recentTransactions, setRecentTransactions] = useState<any[]>([]);
-  const [recentInterviews, setRecentInterviews] = useState<any[]>([]);
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  const [recentInterviews, setRecentInterviews] = useState<Interview[]>([]);
 
   // Fetch user profile and related data
   useEffect(() => {
@@ -126,7 +154,7 @@ export default function DashboardPage() {
             <div className="flex justify-between items-center mb-2">
               <h2 className="text-lg font-bold text-black">Credits</h2>
               <span className="text-sm bg-black bg-opacity-20 px-3 py-1 rounded-full text-black">
-                {profile?.subscription_plan?.name || 'Free'} Plan
+                {profile?.subscription_plan || 'Free'} Plan
               </span>
             </div>
             <div className="flex justify-between items-center mb-2">
@@ -136,8 +164,8 @@ export default function DashboardPage() {
             <div className="w-full bg-black bg-opacity-20 rounded-full h-2.5 mb-1">
               <div 
                 className="bg-black h-2.5 rounded-full" 
-                style={{ 
-                  width: `${profile?.total_credits ? (profile.used_credits / profile.total_credits) * 100 : 0}%` 
+                style={{
+                  width: `${profile?.total_credits ? ((profile?.used_credits || 0) / profile.total_credits) * 100 : 0}%`
                 }}
               ></div>
             </div>
@@ -153,12 +181,12 @@ export default function DashboardPage() {
               <div className="space-y-2 text-gray-300">
                 <p><span className="text-gray-500">Email:</span> {profile?.email}</p>
                 <p><span className="text-gray-500">Name:</span> {profile?.full_name || 'Not set'}</p>
-                <p><span className="text-gray-500">Subscription:</span> {profile?.subscription_plan?.name || 'Free'}</p>
+                <p><span className="text-gray-500">Subscription:</span> {profile?.subscription_plan || 'Free'}</p>
                 <p><span className="text-gray-500">Status:</span> {profile?.subscription_status || 'Inactive'}</p>
                 {profile?.subscription_end_date && (
                   <p><span className="text-gray-500">Renews:</span> {new Date(profile.subscription_end_date).toLocaleDateString()}</p>
                 )}
-                <p><span className="text-gray-500">Interviews:</span> {profile?.interviews_this_month || 0} / {profile?.subscription_plan?.max_interviews_per_month || 5} this month</p>
+                <p><span className="text-gray-500">Interviews:</span> {profile?.interviews_this_month || 0} / 5 this month</p>
               </div>
             </div>
             

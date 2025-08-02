@@ -5,8 +5,19 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 
+interface Plan {
+  id: string;
+  name: string;
+  tag?: string;
+  price: number;
+  price_monthly: number;
+  credits: number;
+  billing_cycle: string;
+  features: string[];
+}
+
 interface PaymentButtonProps {
-  plan: any; // Using any for now since the plan structure comes from the API
+  plan: Plan;
   buttonText: string;
   buttonStyle: 'primary' | 'secondary';
   billingCycle?: 'monthly' | 'yearly';
@@ -15,7 +26,11 @@ interface PaymentButtonProps {
 
 declare global {
   interface Window {
-    Razorpay: any;
+    Razorpay: {
+      new (options: Record<string, unknown>): {
+        open(): void;
+      };
+    };
   }
 }
 
@@ -112,7 +127,11 @@ export default function PaymentButton({
         theme: {
           color: '#F8E71C',
         },
-        handler: async function (response: any) {
+        handler: async function (response: {
+          razorpay_order_id: string;
+          razorpay_payment_id: string;
+          razorpay_signature: string;
+        }) {
           try {
             // Verify payment
             const verifyResponse = await fetch('/api/payment/verify', {
@@ -131,15 +150,19 @@ export default function PaymentButton({
               throw new Error('Payment verification failed');
             }
 
-            const verifyData = await verifyResponse.json();
+            await verifyResponse.json();
 
             // Call onSuccess callback if provided
             if (onSuccess) {
               onSuccess();
             }
 
-            // Show success message and redirect
-            alert('Payment successful! Your subscription has been activated.');
+            // Show appropriate success message based on plan type
+            if (plan.price_monthly === 49) {
+              alert('Payment successful! You have received 5 credits with your one-time Pro upgrade.');
+            } else {
+              alert('Payment successful! Your subscription has been activated.');
+            }
             router.push('/dashboard');
             
           } catch (error) {

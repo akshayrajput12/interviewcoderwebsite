@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/utils/supabase';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     // Initialize Supabase client with cookies
     const supabase = await createServerSupabaseClient();
@@ -108,7 +108,7 @@ export async function PUT(request: Request) {
       .reduce((obj, key) => {
         obj[key] = profileData[key];
         return obj;
-      }, {} as Record<string, any>);
+      }, {} as Record<string, unknown>);
     
     // Add updated_at timestamp
     filteredData.updated_at = new Date().toISOString();

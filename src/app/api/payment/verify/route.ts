@@ -72,7 +72,35 @@ export async function POST(request: Request) {
       }, { status: 404 });
     }
 
-    // Calculate subscription dates
+    // Check if this is a one-time pro plan
+    if (plan.tag === 'One-Time Pro') {
+      // Handle one-time pro purchase
+      const { error: oneTimeProError } = await supabase.rpc('process_one_time_pro_upgrade', {
+        p_user_id: session.user.id,
+        p_order_id: razorpay_order_id,
+        p_payment_id: razorpay_payment_id,
+        p_signature: razorpay_signature
+      });
+
+      if (oneTimeProError) {
+        console.error('One-time pro upgrade error:', oneTimeProError);
+        return NextResponse.json({
+          error: oneTimeProError.message || 'Failed to process one-time pro upgrade'
+        }, { status: 500 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'One-time Pro upgrade successful',
+        upgrade: {
+          plan_name: plan.name,
+          credits_added: plan.credits_per_month,
+          purchase_date: new Date().toISOString(),
+        },
+      });
+    }
+
+    // Calculate subscription dates for regular plans
     const now = new Date();
     const startDate = now;
     let endDate: Date;
